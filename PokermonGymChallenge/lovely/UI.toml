@@ -1,0 +1,97 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = 0
+
+# Gym Challenge - Lovely patches carried over from Pokermon.
+# lovely's [patches.pattern] matches WHOLE LINES, not substrings: a
+# fragment pattern matches nothing, logs a warning and leaves the game
+# unpatched. Every pattern here is a complete line.
+[[patches]]
+[patches.pattern]
+target = "card.lua"
+pattern = "if self.children.use_button and self.highlighted then self.children.use_button:draw() end"
+position = "after"
+payload = '''
+if self.children.poke_display_badge then self.children.poke_display_badge:draw() end
+'''
+match_indent = true
+
+# Poke Ball stakes finish a generation rather than the run, so the victory
+# screen's "Endless" button becomes "New Gen+" (one plus per generation
+# already cleared). Non-League runs keep the vanilla label.
+[[patches]]
+[patches.pattern]
+target = "functions/UI_definitions.lua"
+pattern = '''UIBox_button({button = 'exit_overlay_menu', label = {localize('b_endless')}, minw = 6.5, maxw = 5, minh = 1.2, scale = 0.7, shadow = true, colour = G.C.BLUE, focus_args = {nav = 'wide', button = 'x',set_button_pip = true}}),'''
+position = "at"
+payload = '''(poke_gen_button and poke_gen_button()) or UIBox_button({button = 'exit_overlay_menu', label = {localize('b_endless')}, minw = 6.5, maxw = 5, minh = 1.2, scale = 0.7, shadow = true, colour = G.C.BLUE, focus_args = {nav = 'wide', button = 'x',set_button_pip = true}}),'''
+match_indent = true
+
+# Champion Blinds get the mod's shiny shader over their gold sprite.
+# Blind:draw only shaders its animatedSprite with 'dissolve', so the sheen has
+# to be added here the same way the Shiny edition is added to cards.
+[[patches]]
+[patches.pattern]
+target = "blind.lua"
+pattern = "self.children.animatedSprite:draw_shader('dissolve')"
+position = "after"
+payload = '''
+if self.config and self.config.blind and self.config.blind.poke_champion then
+    self.children.animatedSprite:draw_shader('poke_shiny', nil, self.ARGS.send_to_shader)
+end
+'''
+match_indent = true
+
+# Poke Ball stakes rename the two HUD counters.
+#
+# "Ante n / 13" becomes "Gen 1" over the same n / 13, and "Round" becomes
+# "Trainer" - the Small and Big Blinds are trainer battles inside the Gym, so
+# the round counter is a count of trainers faced.
+#
+# lovely's [patches.pattern] matches WHOLE LINES, not substrings: a fragment
+# pattern matches nothing, logs a warning and leaves the game unpatched. Every
+# pattern here is the complete line, and every payload the complete replacement.
+#
+# Only the label text changes. Both helpers return nil outside a League run, so
+# `or localize(...)` falls through to vanilla, and the ante counter is folded
+# into its generation from Lua (poke_hud_sync_ante) rather than patched.
+[[patches]]
+[patches.pattern]
+target = "functions/UI_definitions.lua"
+pattern = '''{n=G.UIT.T, config={text = localize('k_ante'), scale = 0.85*scale, colour = G.C.UI.TEXT_LIGHT, shadow = true}},'''
+position = "at"
+payload = '''{n=G.UIT.T, config={ref_table = PGC_HUD, ref_value = 'gen_label', scale = 0.85*scale, colour = G.C.UI.TEXT_LIGHT, shadow = true}},'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "functions/UI_definitions.lua"
+pattern = '''{n=G.UIT.T, config={text = localize('k_round'), minh = 0.33, scale = 0.85*scale, colour = G.C.UI.TEXT_LIGHT, shadow = true}},'''
+position = "at"
+payload = '''{n=G.UIT.T, config={text = (poke_hud_round_label and poke_hud_round_label()) or localize('k_round'), minh = 0.33, scale = 0.85*scale, colour = G.C.UI.TEXT_LIGHT, shadow = true}},'''
+match_indent = true
+
+# Poke Ball stakes show one Poke Ball per generation cleared, under the Ante
+# and Round boxes. poke_gen_badge_row returns nil off a League run and the
+# fallback is an empty row, so vanilla's HUD is untouched.
+[[patches]]
+[patches.pattern]
+target = "functions/UI_definitions.lua"
+pattern = '''
+                  {n=G.UIT.O, config={object = DynaText({string = {{ref_table = G.GAME, ref_value = 'round'}}, colours = {G.C.IMPORTANT},shadow = true, scale = 2*scale}),id = 'round_UI_count'}},
+                }},
+              }},
+            }},
+'''
+position = "at"
+payload = '''
+                  {n=G.UIT.O, config={object = DynaText({string = {{ref_table = G.GAME, ref_value = 'round'}}, colours = {G.C.IMPORTANT},shadow = true, scale = 2*scale}),id = 'round_UI_count'}},
+                }},
+              }},
+            }},
+            {n=G.UIT.R, config={align = "cm"}, nodes={
+              (poke_gen_badge_row and poke_gen_badge_row()) or {n=G.UIT.R, config={}, nodes={}}
+            }},
+'''
+match_indent = true

@@ -1,0 +1,51 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = 0
+
+# Gym Challenge - Lovely patches. Pokermon's own pool filters run through pokermon.modify_pool.
+# lovely's [patches.pattern] matches WHOLE LINES, not substrings: a
+# fragment pattern matches nothing, logs a warning and leaves the game
+# unpatched. Every pattern here is a complete line.
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = "if v.yes_pool_flag and not G.GAME.pool_flags[v.yes_pool_flag] then add = nil end"
+position = "after"
+payload = '''
+if v.set == 'Joker' and not v.stage and G.GAME.modifiers and G.GAME.modifiers.poke_only_content then add = nil end
+'''
+match_indent = true
+
+# The League loosens the Soul as generations stack up. Vanilla hard-codes the
+# chance as `> 0.997` inside create_card, so unlike Pokermon's own legendaries
+# (whose soul_rate poke_soul_rate_sync rewrites) it cannot be tuned from Lua.
+# The threshold becomes 1 - 0.003 * multiplier, doubling per generation to 10x.
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = "if pseudorandom('soul_'.._type..G.GAME.round_resets.ante) > 0.997 then"
+position = "at"
+payload = "if pseudorandom('soul_'.._type..G.GAME.round_resets.ante) > 1 - 0.003*(poke_soul_rate_mult and poke_soul_rate_mult() or 1) then"
+match_indent = true
+
+# Home-generation Pokemon appear more often during a League run.
+# get_current_pool builds a flat list of keys sampled uniformly, so weight is
+# expressed as extra copies of the key. How many is decided by
+# poke_gen_extra_copies, which targets a share of the pool but caps each
+# individual Joker so a small generation does not become repetitive.
+# This sits inside the branch that already accepted the centre.
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = "_pool_size = _pool_size + 1"
+position = "after"
+payload = '''
+if poke_gen_extra_copies then
+    for _ = 1, poke_gen_extra_copies(v) do
+        _pool[#_pool + 1] = v.key
+        _pool_size = _pool_size + 1
+    end
+end
+'''
+match_indent = true

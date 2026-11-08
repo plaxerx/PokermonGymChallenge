@@ -1,0 +1,18 @@
+{
+    "id": "PokermonGymChallenge",
+    "name": "Pokermon: Gym Challenge",
+    "author": ["plaxerx"],
+    "description": "The Pokemon League as a Balatro run. Four Poke Ball stakes, thirteen-ante generations of eight Gyms plus the Elite Four and a Champion, and a live type matchup that doubles, halves or nullifies your Pokemon depending on who you are fighting.",
+    "prefix": "pgc",
+    "main_file": "PokermonGymChallenge.lua",
+    "icon_path": "icon.png",
+    "priority": 10,
+    "badge_colour": "C9A227",
+    "badge_text_colour": "26222E",
+    "display_name": "Gym Challenge",
+    "version": "0.1.0",
+    "dependencies": [
+        "Steamodded (>=26.829.0)",
+        "Pokermon (>=3.9.1)"
+    ]
+}
