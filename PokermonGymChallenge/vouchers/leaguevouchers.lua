@@ -38,6 +38,7 @@ local list = {
   }),
   league_voucher(1, {
     key = 'pcbox',
+    poke_rare = true,
     loc_txt = { name = 'PC Box', text = { '{C:dark_edition}Negative{} Pokemon are', '{C:attention}50%{} more likely' } },
     redeem = function(self, card)
       G.GAME.poke_negative_mult = (G.GAME.poke_negative_mult or 1) * 1.5
@@ -93,6 +94,7 @@ local list = {
   }),
   league_voucher(7, {
     key = 'shinycharm',
+    poke_rare = true,
     loc_txt = { name = 'Shiny Charm', text = { '{C:attention}Shiny{} Pokemon are', '{C:attention}50%{} more likely' } },
     redeem = function(self, card)
       G.GAME.poke_shiny_mult = (G.GAME.poke_shiny_mult or 1) * 1.5
@@ -130,6 +132,7 @@ local list = {
   }),
   league_voucher(10, {
     key = 'rarecandy',
+    poke_rare = true,
     loc_txt = { name = 'Rare Candy', text = { 'Pokemon need {C:attention}1{} fewer', 'round to evolve' } },
     redeem = function(self, card)
       G.GAME.poke_rare_candy = (G.GAME.poke_rare_candy or 0) + 1

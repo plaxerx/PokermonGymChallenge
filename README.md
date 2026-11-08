@@ -81,11 +81,11 @@ Once every other voucher is bought, the shop stops offering Blanks and draws fro
 | Voucher | Odds | Effect |
 |---|---|---|
 | League Energy | Common | +1 Energy Limit for all Pokémon Jokers |
-| PC Box | Common | Negative Pokémon are 50% more likely |
 | Amulet Coin | Common | +$25 to the region-clear money cap |
-| Shiny Charm | Common | Shiny Pokémon are 50% more likely |
 | Ability Capsule | Common | Removes Perishable and Rental from selected Jokers |
-| Rare Candy | Common | Pokémon need 1 fewer round to evolve |
+| PC Box | Rare | Negative Pokémon are 50% more likely |
+| Shiny Charm | Rare | Shiny Pokémon are 50% more likely |
+| Rare Candy | Rare | Pokémon need 1 fewer round to evolve |
 | Partner Ribbon | Rare | +1 copy of every Tag you are given |
 | Exp. Share | Rare | +1 hand size |
 | HM Case | Rare | Lifts the ban on your most played banned hand for the rest of the game |
