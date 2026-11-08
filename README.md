@@ -15,7 +15,7 @@ A retooled Balatro experience to complement [Pokermon](https://github.com/InertS
 
 ## Installation
 
-Copy the `PokermonGymChallenge` folder into your Balatro mods directory:
+Download this repository and place its contents in a folder inside your Balatro mods directory:
 
 ```
 %APPDATA%/Balatro/Mods/PokermonGymChallenge/
