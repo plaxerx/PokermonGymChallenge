@@ -23,7 +23,6 @@ PGC_HUD = setmetatable({}, {
 
 -- ---------------------------------------------------------------- data first
 assert(SMODS.load_file("functions/leaguedata.lua"))()
-assert(SMODS.load_file("functions/finaldata.lua"))()
 
 -- ------------------------------------------------------------- then behaviour
 assert(SMODS.load_file("functions/display.lua"))()

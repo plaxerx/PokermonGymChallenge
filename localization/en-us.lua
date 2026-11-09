@@ -95,12 +95,6 @@ return {
             "{C:attention}Master Ball Stake{} difficulty",
             },
             },
-            poke_final_bonus = {
-            name = "Fully Evolved",
-            text = {
-            "{C:attention}+#1#{} #2#",
-            },
-            },
         },
     },
     misc = {

@@ -128,12 +128,7 @@ function Card:set_ability(center, initial, delay_sprites)
   if G.GAME.modifiers.negative_hazards and self.config.center and self.config.center.key == "m_poke_hazard" and self.ability and self.ability.card_limit then
       self.ability.card_limit = self.ability.card_limit - 1
   end
-  -- The final-evolution bonus marker lives on `ability`.
-  local keep_final_bonus = self.ability and self.ability.poke_final_bonus
   local ret = card_set_ability_old(self, center, initial, delay_sprites)
-  if keep_final_bonus and self.ability and not self.ability.poke_final_bonus then
-      self.ability.poke_final_bonus = keep_final_bonus
-  end
   if G.GAME.modifiers.negative_hazards and self.config.center and self.config.center.key == "m_poke_hazard" then
       if not self.ability then self.ability = {} end
       self.ability.card_limit = (self.ability.card_limit or 0) + 1
@@ -182,65 +177,8 @@ end
 local poke_backend_evolve_ref = pokermon.backend_evolve
 pokermon.backend_evolve = function(card, to_key, energize_amount)
   local live = poke_gym_release and poke_gym_release(card)
-  -- The final-evolution hand size travels with the evolution.
-  poke_remove_final_h(card)
   poke_backend_evolve_ref(card, to_key, energize_amount)
-  poke_apply_final_h(card)
   if poke_gym_restore then poke_gym_restore(card, live) end
-end
-
--- Fully-evolved Pokemon from resource lines grant a little more.
-local poke_final_grant = {
-  h_size = function(n) if G.hand then G.hand:change_size(n) end end,
-  hands = function(n)
-    G.GAME.round_resets.hands = G.GAME.round_resets.hands + n
-    if n >= 0 then ease_hands_played(n) else pokermon.ease_hands_played(n) end
-  end,
-  d_size = function(n)
-    G.GAME.round_resets.discards = G.GAME.round_resets.discards + n
-    ease_discard(n)
-  end,
-}
-poke_final_grant.discards = poke_final_grant.d_size
-
-poke_apply_final_h = function(card)
-  if not card or not card.ability or card.ability.poke_final_bonus then return end
-  local center = card.config and card.config.center
-  local targets = center and POKE_FINAL_BONUS and POKE_FINAL_BONUS[center.key]
-  if not targets then return end
-  local extra = (center.config and type(center.config.extra) == 'table')
-    and center.config.extra or {}
-  local paid = nil
-  for field, total in pairs(targets) do
-    local bonus = math.max(0, total - (tonumber(extra[field]) or 0))
-    if bonus > 0 and poke_final_grant[field] then
-      poke_final_grant[field](bonus)
-      paid = paid or {}
-      paid[field] = bonus
-    end
-  end
-  card.ability.poke_final_bonus = paid
-end
-
-poke_remove_final_h = function(card)
-  if not card or not card.ability or not card.ability.poke_final_bonus then return end
-  local paid = card.ability.poke_final_bonus
-  card.ability.poke_final_bonus = nil
-  for field, bonus in pairs(paid) do
-    if poke_final_grant[field] then poke_final_grant[field](-bonus) end
-  end
-end
-
-local poke_add_to_deck_ref = Card.add_to_deck
-function Card:add_to_deck(from_debuff)
-  poke_add_to_deck_ref(self, from_debuff)
-  poke_apply_final_h(self)
-end
-
-local poke_remove_from_deck_ref = Card.remove_from_deck
-function Card:remove_from_deck(from_debuff)
-  poke_remove_from_deck_ref(self, from_debuff)
-  poke_remove_final_h(self)
 end
 
 -- Mod-level callbacks. reset_game_globals runs at round evaluation.

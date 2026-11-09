@@ -64,26 +64,7 @@ if mmy then
 end
 
 -- ------------------------------------------------------- Pokermon helpers
--- Two of Pokermon's helpers need to know about the League.
-if pokermon and pokermon.add_joker_tooltips then
-  local inner_tooltip = pokermon.add_joker_tooltips
-  pokermon.add_joker_tooltips = function(self, info_queue, center)
-    inner_tooltip(self, info_queue, center)
-    if not (POKE_FINAL_BONUS and self and POKE_FINAL_BONUS[self.key]) then return end
-    local extra = (type(self.config) == 'table' and type(self.config.extra) == 'table')
-      and self.config.extra or {}
-    local labels = { h_size = 'hand size', hands = 'hands',
-                     d_size = 'discards', discards = 'discards' }
-    for field, total in pairs(POKE_FINAL_BONUS[self.key]) do
-      local bonus = math.max(0, total - (tonumber(extra[field]) or 0))
-      if bonus > 0 and labels[field] then
-        info_queue[#info_queue + 1] = { set = 'Other', key = 'poke_final_bonus',
-                                        vars = { bonus, labels[field] } }
-      end
-    end
-  end
-end
-
+-- Type stickers change a Joker's matchup mid-ante.
 if pokermon and pokermon.apply_type_sticker then
   local inner_sticker = pokermon.apply_type_sticker
   pokermon.apply_type_sticker = function(card, sticker_type)
